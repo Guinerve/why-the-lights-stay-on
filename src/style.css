@@ -42,3 +42,8 @@ footer { font-size: .85rem; color: var(--muted); margin-top: 40px; }
   .layout .dash { position: sticky; top: 16px; bottom: auto; margin: 56px 0 0; max-height: calc(100vh - 32px); box-shadow: none; }
   .hero, footer { max-width: 1120px; }
 }
+
+.more > summary { cursor: pointer; font: 600 13px system-ui, sans-serif; color: var(--accent); padding: 6px 0; }
+/* Phones: keep the pinned panel small so it never hides the prose and sliders. */
+@media (max-width: 1039px) { .dash { max-height: 32vh; } .dash .verdict { font-size: 13px; } }
+@media (min-width: 1040px) { .more > summary { display: none; } }

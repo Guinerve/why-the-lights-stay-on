@@ -78,5 +78,8 @@ function render(): void {
   }
 }
 
+const wide = window.matchMedia("(min-width: 1040px)");
+const syncMore = () => { $<HTMLDetailsElement>("#more").open = wide.matches; }; // always open on wide screens, collapsed on phones
+syncMore(); wide.addEventListener("change", syncMore);
 document.querySelectorAll("input[type=range]").forEach((el) => el.addEventListener("input", render));
 render();

@@ -54,7 +54,7 @@ Single-bus aggregate model: no network, no voltage, no protection detail. The re
 
 ## Browser check
 
-Checked in real Chrome (headless, driven with puppeteer) on 2026-10-12: the page loads without console errors; the charts update; on wide screens the charts sit in a sticky side column (they used to cover the sliders). Phone width was screenshotted but not reviewed by eye.
+Checked in real Chrome (headless, driven with puppeteer) on 2026-10-12: the page loads without console errors; the charts update; on wide screens the charts sit in a sticky side column (they used to cover the sliders). On a phone the pinned panel was covering the prose; it is now capped at 32 % of the viewport and shows only the frequency chart, with the other two behind a "More charts" toggle (checked at 390 px wide: no horizontal overflow). `powerflow-playground` and `ember` were also checked at 390 px: no overflow.
 
 ## Next (tomorrow)
 
