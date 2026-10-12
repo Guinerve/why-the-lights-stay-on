@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Why the lights stay on</title>
+  <meta name="description" content="What happens to grid frequency when a big generator trips? Drag the sliders and find out." />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <header class="hero">
+    <p class="kicker">An interactive explainer</p>
+    <h1>Why the lights stay on</h1>
+    <p class="lede">A big power station trips. For a few seconds the grid has less supply than demand, and the only thing holding the frequency up is the spinning mass of every generator in the country. Here is what happens next, and what you can do about it.</p>
+  </header>
+
+  <main>
+    <section class="step">
+      <h2>1. The trip</h2>
+      <p>Every synchronous generator is a heavy rotor locked to the grid frequency. When supply drops below demand, that stored kinetic energy is drawn down and the grid slows. The rate of fall (<b>RoCoF</b>) is set by how much was lost compared with how much inertia is online.</p>
+      <label class="ctl"><span>Generation lost <output data-for="lossPu"></output></span><input id="lossPu" type="range" min="1" max="20" step="0.5" value="8" /></label>
+      <label class="ctl"><span>System inertia H <output data-for="H"></output></span><input id="H" type="range" min="1" max="8" step="0.1" value="4" /></label>
+      <p class="hint">Try dropping H towards 1. This is what a grid with few spinning machines looks like.</p>
+    </section>
+
+    <section class="step">
+      <h2>2. Governors push back</h2>
+      <p>Governors on thermal and hydro units open their valves as frequency falls. <b>Droop</b> says how hard: at 5% droop, a 5% frequency drop would take a unit from zero to full output. They need seconds to act, and only have so much headroom.</p>
+      <label class="ctl"><span>Governor droop <output data-for="droop"></output></span><input id="droop" type="range" min="2" max="12" step="0.5" value="5" /></label>
+      <label class="ctl"><span>Headroom available <output data-for="governorHeadroom"></output></span><input id="governorHeadroom" type="range" min="0" max="20" step="1" value="10" /></label>
+    </section>
+
+    <section class="step">
+      <h2>3. Batteries, fast</h2>
+      <p>Grid batteries sense the fall and inject power within a fraction of a second, long before a governor has moved. How quickly they react matters as much as how big they are.</p>
+      <label class="ctl"><span>Battery size <output data-for="batterySize"></output></span><input id="batterySize" type="range" min="0" max="10" step="0.5" value="3" /></label>
+      <label class="ctl"><span>Response delay <output data-for="batteryDelay"></output></span><input id="batteryDelay" type="range" min="0.05" max="3" step="0.05" value="0.3" /></label>
+    </section>
+  </main>
+
+  <aside class="dash">
+    <div class="chart-wrap"><h3>Frequency <span id="nadir"></span></h3><svg id="chart-f" role="img" aria-label="Frequency over time"></svg></div>
+    <div class="chart-wrap"><h3>Rate of change <span id="rocof"></span></h3><svg id="chart-r" role="img" aria-label="Rate of change of frequency over time"></svg></div>
+    <div class="chart-wrap"><h3>Who is helping</h3><svg id="chart-p" role="img" aria-label="Governor and battery response over time"></svg></div>
+    <p id="verdict" class="verdict" role="status"></p>
+  </aside>
+
+  <footer>
+    <p><b>Limits.</b> A single-bus aggregate model: no network, no voltage, no protection detail. Thresholds follow the NEM frequency operating standard (normal band 49.85 Hz, contingency 49.5 Hz, under-frequency load shedding from 49.0 Hz). Educational, not an operational tool.</p>
+  </footer>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
