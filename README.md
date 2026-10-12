@@ -2,7 +2,9 @@
 
 > An interactive explainer of what happens to grid frequency when a big generator trips.
 
-**Status:** v0.1 core built (not yet visually checked in a browser) · Portfolio project #2 · see `../README.md`
+**Status:** v0.1 core built; layout and charts checked in real Chrome
+
+![why-the-lights-stay-on screenshot](assets/screenshot.png)
 
 ## The idea
 
@@ -42,7 +44,7 @@ npm test         # 7 tests
 
 Review fixes: the pinned chart panel is capped at 42 % of the viewport (it used to cover the sliders on laptop screens), and the power chart's axis scales with the sliders instead of clipping.
 
-Not yet done: a browser check of the charts and layout (the browser tool failed this session), and comparison against a published event.
+Not yet done: comparison against a published event.
 
 ## Limits
 
@@ -50,9 +52,13 @@ Not yet done: a browser check of the charts and layout (the browser tool failed 
 
 Single-bus aggregate model: no network, no voltage, no protection detail. The replay is qualitative, not a reconstruction.
 
+## Browser check
+
+Checked in real Chrome (headless, driven with puppeteer) on 2026-10-12: the page loads without console errors; the charts update; on wide screens the charts sit in a sticky side column (they used to cover the sliders). Phone width was screenshotted but not reviewed by eye.
+
 ## Next (tomorrow)
 
-- Look at it in a browser at phone width; tune the sticky chart panel.
+- Review the phone layout by eye (screenshotted, not reviewed).
 - Write the AEMO-incident "Replay" preset (pick a public incident report, label it qualitative).
 - Prose pass, hero GIF.
 
@@ -62,7 +68,7 @@ A second chapter on system strength and grid-forming inverters.
 
 ## Definition of done
 
-- [ ] Hero GIF or screenshot at the top of this README
+- [x] Hero GIF or screenshot at the top of this README (static screenshot; no GIF yet)
 - [x] Live demo link or one-command run (`npm install && npm run dev`)
 - [ ] "How I know it's right" section filled in with real results
 - [ ] Tests passing in CI, badge added
