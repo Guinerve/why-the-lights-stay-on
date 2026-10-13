@@ -1,80 +1,98 @@
-# why-the-lights-stay-on
+# Why the lights stay on
 
-> An interactive explainer of what happens to grid frequency when a big generator trips.
+[![CI](https://github.com/Guinerve/why-the-lights-stay-on/actions/workflows/ci.yml/badge.svg)](https://github.com/Guinerve/why-the-lights-stay-on/actions/workflows/ci.yml)
 
-**Status:** v0.1 core built; layout and charts checked in real Chrome
+An interactive explanation of grid frequency after a generator trip. Change inertia, generation loss, governor response, and battery response. Then compare one fixed scenario with a documented event.
 
-![why-the-lights-stay-on demo](assets/demo.gif)
+![Frequency charts beside the model assumptions](assets/screenshot.png)
 
-![why-the-lights-stay-on screenshot](assets/screenshot.png)
+## Run
 
-## The idea
-
-An interactive explainer in the style of Bartosz Ciechanowski or Nicky Case. A big generator trips and frequency falls. How far it falls depends on system inertia, governor droop and how fast batteries respond.
-
-## Stack
-
-TypeScript, Vite, Canvas/SVG charts, Vitest.
-
-Dev server binds to `0.0.0.0` on port **5191** so it's reachable over Tailscale (`vite --host 0.0.0.0 --port 5191 --strictPort`). Deploy to GitHub Pages.
-
-## Build plan (v1)
-
-- [x] Aggregated swing equation: 2H/f₀ · df/dt = Pₘ − Pₑ, with governor droop and a battery fast-frequency-response block
-- [x] Fixed-step RK4 integrator
-- [x] Sliders: inertia (H), generator size lost, droop, battery response delay and size
-- [x] Live charts: frequency and RoCoF, with a line marking where under-frequency load shedding starts
-- [ ] (partly done) Scrolling prose that walks the reader through each slider (three sections written; needs an editing pass and a sticky chart layout check on a phone)
-- [ ] "Replay" preset reproducing the *shape* of a published AEMO incident report (labelled qualitative)
-
-## Run it
+Use Node.js 22 (22.12 or later) or Node.js 24.
 
 ```bash
-npm install
-npm run dev      # http://0.0.0.0:5191 (Tailscale-reachable, --strictPort)
-npm test         # 7 tests
+npm ci
+npm run dev
 ```
 
-## How I know it's right
+Open `http://localhost:5191`. The server binds to `0.0.0.0`, so other Tailscale devices can use `http://<tailscale-ip>:5191`. Port 5191 is fixed. The server fails if the port is occupied.
 
-7 unit tests pass (`src/sim.test.ts`):
+```bash
+npm test          # 14 tests
+npm run build    # TypeScript check and production build
+npm run preview  # Serve the build on port 5191; stop the dev server first
+```
 
-- With no droop and no damping the integrator reproduces the analytic linear decline, `df/dt = -ΔP·f₀/(2H)`, to 9 decimals.
-- Steady-state deviation matches the droop formula `Δf = -ΔP·f₀ / (1/R + D)` to 3 decimals, with and without load damping.
-- More inertia gives a gentler initial RoCoF; a bigger or faster battery raises the nadir.
-- Halving the RK4 step changes the nadir by under 0.005 Hz.
+The build is a static site in `dist/`. Relative asset paths support deployment under a subdirectory. No API keys or backend are needed.
 
-Review fixes: the pinned chart panel is capped at 42 % of the viewport (it used to cover the sliders on laptop screens), and the power chart's axis scales with the sliders instead of clipping.
+## A documented event, not a replay
 
-Not yet done: comparison against a published event.
+On **9 October 2019**, Kogan Creek in Queensland tripped from **748 MW**. AEMO reports that frequency fell to **49.61 Hz**. The South Australia virtual power plant detected the fall and injected power to help recovery.
 
-## Limits
+Source: [AEMO, *Virtual Power Plant Demonstration*, knowledge sharing report #1, section 2.1.1, page 7](https://arena.gov.au/assets/2020/03/aemo-virtual-power-plant-demonstration-knowledge-sharing-report-1.pdf#page=7).
 
-**Model constants are plausible, not fitted**: governor time constant 4 s, 10% headroom, load damping 1, battery full output at a 0.5 Hz deviation. Thresholds follow the NEM frequency operating standard (49.85 / 49.5 / 49.0 Hz).
+The comparison uses the reported loss, not fitted response parameters:
 
-Single-bus aggregate model: no network, no voltage, no protection detail. The replay is qualitative, not a reconstruction.
+| Quantity | Fixed model input or result | Evidence status |
+| --- | --- | --- |
+| Generation lost | 748 MW | Reported by AEMO |
+| System load base | 25,000 MW | Assumed, not event data |
+| Per-unit loss | 0.02992 (2.992%) | Calculated from loss and assumed base |
+| Inertia H | 4 s | Assumed |
+| Governor droop / time constant / headroom | 5% / 4 s / 10% | Assumed |
+| Load damping | 1 | Assumed |
+| Battery power | 0 | Omitted; aggregate event capacity is not established by this source |
+| Initial frequency | 50 Hz | Assumed |
+| Model minimum | 49.78 Hz at 2.09 s | Calculated over 30 s at a 0.01 s step |
+| Reported event minimum | 49.61 Hz | Reported by AEMO; no event timing claim |
+| Model minus reported minimum | +0.17 Hz | Calculated, before rounding |
 
-## Browser check
+The model understates the frequency fall. Its chart shows the calculated trace and a dashed line at the reported minimum. **The line is not a measured time series.** The comparison stays fixed when the six existing sliders change. No controls were added.
 
-Checked in real Chrome (headless, driven with puppeteer) on 2026-10-12: the page loads without console errors; the charts update; on wide screens the charts sit in a sticky side column (they used to cover the sliders). On a phone the pinned panel was covering the prose; it is now capped at 32 % of the viewport and shows only the frequency chart, with the other two behind a "More charts" toggle (checked at 390 px wide: no horizontal overflow). `powerflow-playground` and `ember` were also checked at 390 px: no overflow.
+![Fixed model trace and the reported minimum reference](assets/event-comparison.png)
 
-## Next (tomorrow)
+This is an engineering communication example: separate evidence from assumptions, show the error, and state what the result cannot prove. Matching one minimum would not validate the timing or cause. See [the source notes and model differences](research/2026-10-13-kogan-creek-comparison.md).
 
-- Review the phone layout by eye (screenshotted, not reviewed).
-- Write the AEMO-incident "Replay" preset (pick a public incident report, label it qualitative).
-- Prose pass, hero GIF.
+## Model and limits
 
-## Stretch
+The single-bus swing equation uses powers per unit of pre-event system load:
 
-A second chapter on system strength and grid-forming inverters.
+```text
+2H/f₀ · dΔf/dt = −loss + governor + battery − D·Δf/f₀
+```
 
-## Definition of done
+The governor follows a droop target with a first-order lag and a headroom limit. The battery uses delayed frequency feedback. It reaches its power limit at a 0.5 Hz deviation. The integrator uses fixed-step RK4 for frequency and governor state. Battery output is held constant within each integration step; delay is rounded to whole steps.
 
-- [x] Hero GIF or screenshot at the top of this README
-- [x] Live demo link or one-command run (`npm install && npm run dev`)
-- [ ] "How I know it's right" section filled in with real results
-- [ ] Tests passing in CI, badge added
-- [ ] "Limits" section written
-- [ ] Licence chosen, repo description and topics set
-- [ ] Pinned on GitHub profile and added to guinerve.github.io
-- [ ] Added to `career-radar/data/cv/portfolio.json`
+The model has no transmission network, voltage, separate machines, governor deadbands, secondary frequency control, battery energy limit, or protection action. It can settle below 50 Hz. The battery can absorb power if delayed frequency feedback is above 50 Hz. Power and frequency axes expand to show extreme slider results.
+
+The chart uses 49.85 Hz as a lower normal-band reference, 49.5 Hz as a single-generation-event reference, and 49.0 Hz as an illustrative load-shedding threshold. These are not a complete compliance test. Actual requirements and protection settings depend on the region and event. See the [AEMC frequency operating standard review](https://www.aemc.gov.au/market-reviews-advice/review-frequency-operating-standard-2022).
+
+Crossing 49.0 Hz changes the warning only. The simulation does not shed load or predict customer outages. **Educational, not an operational tool.**
+
+## Verification
+
+`npm test` checks:
+
+- Analytic linear decline without governor response, damping, or battery response.
+- Steady-state droop balance, with and without load damping.
+- The effects of inertia, battery power, and battery delay.
+- Nadir stability when the integration step is halved.
+- Delayed feedback, response power limits, and the absence of load-shedding action.
+- Finite traces at all 64 corners of the six slider ranges.
+- Event loss conversion, the numerical mismatch, and independence from slider changes.
+
+CI runs the tests and the TypeScript/build check on pushes and pull requests. These checks verify the implementation and selected equations. **They do not validate the model against the real grid.**
+
+Browser checks cover the fixed comparison, slider updates, keyboard use, chart expansion, console errors, and horizontal overflow. Wide screens use a sticky chart column. Narrow screens use a capped chart panel with rate-of-change and power charts behind “More charts”.
+
+Checked on 13 October 2026 in Chromium through Playwright: no horizontal overflow at 320, 390, 768, 1024, or 1440 px wide, or at 844 × 390 in landscape. All 64 slider-range corners rendered finite chart paths. The fixed comparison stayed unchanged. Light and dark layouts were inspected. No console warnings or errors were reported. `npm audit` reported zero vulnerabilities.
+
+## Source map
+
+- `src/sim.ts`: model, integration, and summary metrics.
+- `src/chart.ts`: SVG chart rendering.
+- `src/main.ts`: slider bindings and the fixed comparison.
+- `src/event.ts`: reported values, source URL, and assumed comparison inputs.
+- `index.html`: explanation, source citation, and model limits.
+
+TypeScript, Vite, SVG, and Vitest. [MIT license](LICENSE).

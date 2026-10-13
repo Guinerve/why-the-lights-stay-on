@@ -132,7 +132,7 @@ export function summarise(tr: Trace, p: Params) {
   };
 }
 
-/** NEM frequency operating standard: normal band 49.85–50.15, contingency band 49.5, UFLS from 49.0. */
+/** Teaching references, not a complete NEM standard or a regional protection scheme. */
 export const NORMAL_LOW_HZ = 49.85;
 export const CONTINGENCY_LOW_HZ = 49.5;
 export const UFLS_HZ = 49.0;

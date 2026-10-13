@@ -15,16 +15,23 @@ body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.6 Georgi
 .kicker { font: 600 13px/1 system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
 h1 { font-size: 2.4rem; line-height: 1.15; margin: .3em 0; }
 h2 { font-size: 1.3rem; margin: 0 0 .4em; }
+h3 { font-size: 1.05rem; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .lede { font-size: 1.15rem; color: var(--muted); }
 .step { margin: 40px 0; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
 .ctl { display: block; margin: 14px 0; font: 14px/1.3 system-ui, sans-serif; }
-.ctl span { display: flex; justify-content: space-between; margin-bottom: 4px; color: var(--muted); }
+.ctl span { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; margin-bottom: 4px; color: var(--muted); }
 .ctl output { color: var(--fg); font-weight: 600; }
 .ctl input { width: 100%; accent-color: var(--accent); }
 .hint { font-size: .9rem; color: var(--muted); font-style: italic; }
 .dash { position: sticky; bottom: 0; max-height: 42vh; overflow-y: auto; max-width: 560px; margin: 0 auto; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px 10px; box-shadow: 0 -6px 24px #0002; }
-.chart-wrap h3 { margin: 6px 0 0; font: 600 13px/1.2 system-ui, sans-serif; display: flex; justify-content: space-between; }
+.dash-label { margin: 0 0 6px; color: var(--muted); font: 600 12px/1.3 system-ui, sans-serif; }
+.chart-wrap h3 { margin: 6px 0 0; font: 600 13px/1.2 system-ui, sans-serif; display: flex; flex-wrap: wrap; gap: 4px 8px; justify-content: space-between; }
 .chart-wrap h3 span { font-weight: 400; color: var(--muted); }
+.chart-legend { margin: 4px 0 0; font: 12px/1.3 system-ui, sans-serif; }
+.governor-key { color: var(--gov); }
+.battery-key { color: var(--batt); }
 svg { width: 100%; height: auto; display: block; }
 .grid { stroke: var(--line); stroke-width: 1; }
 .tick { fill: var(--muted); font: 10px system-ui, sans-serif; }
@@ -34,6 +41,12 @@ svg { width: 100%; height: auto; display: block; }
 .verdict.warn { border-color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); }
 .verdict.bad { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, transparent); }
 footer { font-size: .85rem; color: var(--muted); margin-top: 40px; }
+.event-figure { margin: 24px 0; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
+.event-figure figcaption { margin-top: 8px; color: var(--muted); font: 13px/1.5 system-ui, sans-serif; }
+.event-results { font: 14px/1.5 system-ui, sans-serif; }
+.event-results > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.event-results dd { margin: 0; font-weight: 600; }
+.comparison li { margin-bottom: 12px; }
 @media (max-height: 560px) { .dash { position: static; max-height: none; } }
 
 /* Wide screens: the charts sit in a sticky column beside the prose, so they never cover the sliders. */
