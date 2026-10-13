@@ -52,3 +52,26 @@ export function drawChart(svg: SVGSVGElement, series: Series[], o: ChartOpts): v
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.innerHTML = out;
 }
+
+/**
+ * Round axis ticks: multiples of 1, 2, 2.5 or 5 × 10^k inside [min, max].
+ * The label format shows enough decimals that each label equals its gridline value.
+ */
+export function niceTicks(min: number, max: number, maxTicks = 6): { ticks: number[]; format: (v: number) => string } {
+  const span = max - min;
+  if (!(span > 0) || !Number.isFinite(span)) return { ticks: [min], format: (v) => v.toFixed(1) };
+  const magnitude = 10 ** Math.floor(Math.log10(span / maxTicks));
+  let step = magnitude * 10;
+  for (const m of [1, 2, 2.5, 5, 10]) {
+    if (Math.floor(max / (m * magnitude) + 1e-9) - Math.ceil(min / (m * magnitude) - 1e-9) + 1 <= maxTicks) {
+      step = m * magnitude;
+      break;
+    }
+  }
+  const ticks: number[] = [];
+  for (let k = Math.ceil(min / step - 1e-9); k <= Math.floor(max / step + 1e-9); k++) {
+    ticks.push(Number((k * step).toPrecision(12)));
+  }
+  const decimals = Math.max(1, ...ticks.map((t) => (String(t).split(".")[1] ?? "").length));
+  return { ticks, format: (v) => v.toFixed(decimals) };
+}

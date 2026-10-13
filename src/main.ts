@@ -1,4 +1,4 @@
-import { drawChart } from "./chart";
+import { drawChart, niceTicks } from "./chart";
 import { EVENT_PARAMS, KOGAN_CREEK } from "./event";
 import {
   CONTINGENCY_LOW_HZ, DEFAULTS, NORMAL_LOW_HZ, UFLS_HZ,
@@ -9,7 +9,7 @@ const DURATION = 30;
 
 /** Slider id → how to turn the raw slider value into model units + a label. */
 const controls: Record<string, { toModel: (v: number) => number; label: (v: number) => string; key: keyof Params }> = {
-  lossPu: { key: "lossPu", toModel: (v) => v / 100, label: (v) => `${v}% (${((v / 100) * KOGAN_CREEK.assumedBaseMw).toFixed(0)} MW on assumed 25 GW)` },
+  lossPu: { key: "lossPu", toModel: (v) => v / 100, label: (v) => `${v}% (${((v / 100) * KOGAN_CREEK.assumedBaseMw).toFixed(0)} MW on assumed ${KOGAN_CREEK.assumedBaseMw / 1000} GW)` },
   H: { key: "H", toModel: (v) => v, label: (v) => `${v.toFixed(1)} s` },
   droop: { key: "droop", toModel: (v) => v / 100, label: (v) => `${v}%` },
   governorHeadroom: { key: "governorHeadroom", toModel: (v) => v / 100, label: (v) => `${v}% of load` },
@@ -39,20 +39,22 @@ function render(): void {
   const rMin = Math.min(-2, Math.floor(Math.min(...tr.rocof)));
   const rMax = Math.max(0.5, Math.ceil(Math.max(...tr.rocof)));
 
+  const fAxis = niceTicks(fMin, fMax);
   drawChart($("#chart-f"), [{ x: tr.t, y: tr.f, color: "var(--accent)" }], {
     yMin: fMin, yMax: fMax, xMax: DURATION,
-    yTicks: fMin === 48 && fMax === 50.2 ? [48, 48.5, 49, 49.5, 50] : Array.from({ length: 5 }, (_, i) => fMin + i * (fMax - fMin) / 4),
-    yFormat: (v) => v.toFixed(1),
+    yTicks: fAxis.ticks,
+    yFormat: fAxis.format,
     hlines: [
       { y: NORMAL_LOW_HZ, color: "var(--ok)", label: "normal band" },
       { y: CONTINGENCY_LOW_HZ, color: "var(--warn)", label: "event reference 49.5" },
       { y: UFLS_HZ, color: "var(--bad)", label: "UFLS reference 49.0" },
     ],
   });
+  const rAxis = niceTicks(rMin, rMax);
   drawChart($("#chart-r"), [{ x: tr.t, y: tr.rocof, color: "var(--accent2)" }], {
     yMin: rMin, yMax: rMax, xMax: DURATION,
-    yTicks: rMin === -2 && rMax === 1 ? [-2, -1, 0] : Array.from({ length: 4 }, (_, i) => rMin + i * (rMax - rMin) / 3),
-    yFormat: (v) => v.toFixed(1),
+    yTicks: rAxis.ticks,
+    yFormat: rAxis.format,
     hlines: [{ y: -1, color: "var(--warn)", label: "−1 Hz/s reference" }],
   });
   // Axis tall enough for the larger of the governor headroom, the battery and the lost generation, in percent.

@@ -56,7 +56,7 @@ describe("swing equation", () => {
     expect(fast).toBeGreaterThan(slow);
   });
 
-  it("is deterministic and RK4 is step-size stable", () => {
+  it("gives the same nadir to 0.01 Hz when the time step is halved", () => {
     const a = simulate(DEFAULTS, 20, 0.01);
     const b = simulate(DEFAULTS, 20, 0.005);
     expect(summarise(a, DEFAULTS).nadir).toBeCloseTo(summarise(b, DEFAULTS).nadir, 2);
