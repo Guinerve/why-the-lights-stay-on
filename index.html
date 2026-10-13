@@ -15,56 +15,32 @@
     <p class="lede">A big generator trips. Supply falls below demand. Stored energy in spinning machines slows the fall in frequency while other sources respond. Change the assumptions below, then compare the model with a documented grid event.</p>
   </header>
 
-  <div class="layout">
   <main>
+  <div class="layout">
+  <div class="steps">
     <section class="step">
       <h2>1. The trip</h2>
       <p>Every synchronous generator is a heavy rotor locked to the grid frequency. When supply drops below demand, that stored kinetic energy is drawn down and the grid slows. The rate of fall (<b>RoCoF</b>) is set by how much was lost compared with how much inertia is online.</p>
       <label class="ctl" for="lossPu"><span>Generation lost <output data-for="lossPu"></output></span><input id="lossPu" type="range" min="1" max="20" step="0.5" value="8" /></label>
       <label class="ctl" for="H"><span>System inertia H <output data-for="H"></output></span><input id="H" type="range" min="1" max="8" step="0.1" value="4" /></label>
       <p class="hint">Reduce H towards 1 s. The same loss now causes a faster initial fall in frequency.</p>
-    </section>
+  </section>
 
     <section class="step">
       <h2>2. Governors push back</h2>
       <p>Governors on thermal and hydro units increase power as frequency falls. <b>Droop</b> sets the requested response. Here, 5% droop requests an extra 1% of system load for a 0.025 Hz fall. A 4 s time constant slows that response. Available headroom limits it.</p>
       <label class="ctl" for="droop"><span>Governor droop <output data-for="droop"></output></span><input id="droop" type="range" min="2" max="12" step="0.5" value="5" /></label>
       <label class="ctl" for="governorHeadroom"><span>Headroom available <output data-for="governorHeadroom"></output></span><input id="governorHeadroom" type="range" min="0" max="20" step="1" value="10" /></label>
-    </section>
+  </section>
 
     <section class="step">
       <h2>3. Batteries, fast</h2>
       <p>A battery can respond faster than a turbine. Here, it uses delayed frequency feedback and reaches full output at a 0.5 Hz deviation. Reduce the delay or increase the power limit to see how the lowest frequency changes. “Battery size” means power, not stored energy.</p>
       <label class="ctl" for="batterySize"><span>Battery size <output data-for="batterySize"></output></span><input id="batterySize" type="range" min="0" max="10" step="0.5" value="3" /></label>
       <label class="ctl" for="batteryDelay"><span>Response delay <output data-for="batteryDelay"></output></span><input id="batteryDelay" type="range" min="0.05" max="3" step="0.05" value="0.3" /></label>
-    </section>
+  </section>
 
-    <section class="step comparison" aria-labelledby="event-heading">
-      <p class="kicker">Evidence and assumptions</p>
-      <h2 id="event-heading">4. One real trip, not a replay</h2>
-      <p>On 9 October 2019, Kogan Creek in Queensland tripped from <b>748 MW</b>. AEMO reports that frequency fell to <b>49.61 Hz</b>. The South Australia virtual power plant detected the fall and injected power to help recovery.</p>
-      <p><a id="event-source" href="https://arena.gov.au/assets/2020/03/aemo-virtual-power-plant-demonstration-knowledge-sharing-report-1.pdf#page=7">Source: AEMO, Virtual Power Plant Demonstration, report #1, section 2.1.1, page 7 (PDF)</a>.</p>
-      <p>For a fixed comparison, use the same 748 MW loss on an <b>assumed 25 GW system base</b>: 2.992% of load. Keep H = 4 s, droop = 5%, governor time constant = 4 s, headroom = 10%, and load damping = 1. Start at 50 Hz. Omit the battery because the report does not give an aggregate battery capacity for this model.</p>
-      <figure class="event-figure">
-        <svg id="chart-event" role="img" aria-label="Fixed model frequency trace with a reference line at AEMO’s reported 49.61 Hz minimum"></svg>
-        <figcaption>Blue: fixed model trace. Dashed: reported event minimum, not a measured time series. This comparison does not change with the sliders.</figcaption>
-      </figure>
-      <dl class="event-results">
-        <div><dt>Reported event minimum</dt><dd>49.61 Hz</dd></div>
-        <div><dt>Model minimum</dt><dd id="event-nadir"></dd></div>
-        <div><dt>Model minus reported minimum</dt><dd id="event-gap"></dd></div>
-      </dl>
-      <p id="event-result"></p>
-      <h3>Where the model differs</h3>
-      <ul>
-        <li><b>One frequency.</b> The model has no transmission network, regional oscillations, voltage, or separate machines. It cannot reproduce local measurements or network constraints.</li>
-        <li><b>Assumed response.</b> Real units have different inertia, governor settings, deadbands, and available reserves. The system base and response constants above are not measured event inputs.</li>
-        <li><b>No event battery response.</b> AEMO documents a VPP response. This comparison omits it. Adding a guessed battery size would not establish its share of the system response.</li>
-        <li><b>No restoration or protection action.</b> The model has no secondary frequency control, battery energy limit, or load-shedding logic. Crossing a threshold only changes the warning. The model can settle below 50 Hz.</li>
-      </ul>
-      <p><b>The engineering conclusion:</b> the model explains how power imbalance, inertia, and response affect frequency. Its higher minimum does not validate the event response. Matching one number would not prove the timing or cause. A reconstruction needs measured system conditions, response data, and a frequency time series.</p>
-    </section>
-  </main>
+  </div>
 
   <aside class="dash">
     <p class="dash-label">Slider scenario</p>
@@ -76,6 +52,39 @@
     <p id="verdict" class="verdict" role="status"></p>
   </aside>
   </div>
+
+  <section class="step comparison" aria-labelledby="event-heading">
+    <div class="event-intro">
+      <p class="kicker">Evidence and assumptions</p>
+      <h2 id="event-heading">4. One real trip, not a replay</h2>
+      <p>On 9 October 2019, Kogan Creek in Queensland tripped from <b>748 MW</b>. AEMO reports that frequency fell to <b>49.61 Hz</b>. The South Australia virtual power plant detected the fall and injected power to help recovery.</p>
+      <p><a id="event-source" href="https://arena.gov.au/assets/2020/03/aemo-virtual-power-plant-demonstration-knowledge-sharing-report-1.pdf#page=7">Source: AEMO, Virtual Power Plant Demonstration, report #1, section 2.1.1, page 7 (PDF)</a>.</p>
+      <p>For a fixed comparison, use the same 748 MW loss on an <b>assumed 25 GW system base</b>: 2.992% of load. Keep H = 4 s, droop = 5%, governor time constant = 4 s, headroom = 10%, and load damping = 1. Start at 50 Hz. Omit the battery because the report does not give an aggregate battery capacity for this model.</p>
+    </div>
+    <div class="event-panel">
+      <figure class="event-figure">
+        <svg id="chart-event" role="img" aria-label="Fixed model frequency trace with a reference line at AEMO’s reported 49.61 Hz minimum"></svg>
+        <figcaption>Blue: fixed model trace. Dashed: reported event minimum, not a measured time series. This comparison does not change with the sliders.</figcaption>
+      </figure>
+      <dl class="event-results">
+        <div><dt>Reported event minimum</dt><dd>49.61 Hz</dd></div>
+        <div><dt>Model minimum</dt><dd id="event-nadir"></dd></div>
+        <div><dt>Model minus reported minimum</dt><dd id="event-gap"></dd></div>
+      </dl>
+      <p id="event-result"></p>
+    </div>
+    <div class="event-notes">
+      <h3>Where the model differs</h3>
+      <ul>
+        <li><b>One frequency.</b> The model has no transmission network, regional oscillations, voltage, or separate machines. It cannot reproduce local measurements or network constraints.</li>
+        <li><b>Assumed response.</b> Real units have different inertia, governor settings, deadbands, and available reserves. The system base and response constants above are not measured event inputs.</li>
+        <li><b>No event battery response.</b> AEMO documents a VPP response. This comparison omits it. Adding a guessed battery size would not establish its share of the system response.</li>
+        <li><b>No restoration or protection action.</b> The model has no secondary frequency control, battery energy limit, or load-shedding logic. Crossing a threshold only changes the warning. The model can settle below 50 Hz.</li>
+      </ul>
+      <p><b>The engineering conclusion:</b> the model explains how power imbalance, inertia, and response affect frequency. Its higher minimum does not validate the event response. Matching one number would not prove the timing or cause. A reconstruction needs measured system conditions, response data, and a frequency time series.</p>
+    </div>
+  </section>
+  </main>
 
   <footer>
     <p><b>Limits.</b> A single-bus aggregate model, not an operational tool. The chart uses 49.85 Hz as the lower normal-band reference, 49.5 Hz as a single-generation-event reference, and 49.0 Hz as an illustrative load-shedding threshold. Actual limits and protection settings depend on the region and event. The model does not shed load or predict customer outages.</p>

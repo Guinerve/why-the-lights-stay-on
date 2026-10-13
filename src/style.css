@@ -1,6 +1,6 @@
 :root {
   --bg: #fbfaf7; --fg: #1d2a33; --muted: #5b6770; --card: #ffffff; --line: #e3e0d8;
-  --accent: #1f6feb; --accent2: #8250df; --gov: #b35900; --batt: #1a7f4b;
+  --accent: #1a5fd0; --accent2: #8250df; --gov: #b35900; --batt: #1a7f4b;
   --ok: #1a7f4b; --warn: #b35900; --bad: #cf222e;
 }
 @media (prefers-color-scheme: dark) {
@@ -9,7 +9,7 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.6 Georgia, "Iowan Old Style", serif; padding: 0 16px 48px; }
-.hero, main, footer { max-width: 560px; margin: 0 auto; }
+.hero, .steps, .comparison, footer { max-width: 560px; margin: 0 auto; }
 .layout { display: block; }
 .hero { padding: 56px 0 8px; }
 .kicker { font: 600 13px/1 system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
@@ -18,7 +18,7 @@ h2 { font-size: 1.3rem; margin: 0 0 .4em; }
 h3 { font-size: 1.05rem; }
 a { color: var(--accent); text-underline-offset: 3px; }
 a:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-.lede { font-size: 1.15rem; color: var(--muted); }
+.lede { font-size: 1.15rem; color: var(--muted); max-width: 40em; }
 .step { margin: 40px 0; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
 .ctl { display: block; margin: 14px 0; font: 14px/1.3 system-ui, sans-serif; }
 .ctl span { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; margin-bottom: 4px; color: var(--muted); }
@@ -36,17 +36,20 @@ svg { width: 100%; height: auto; display: block; }
 .grid { stroke: var(--line); stroke-width: 1; }
 .tick { fill: var(--muted); font: 10px system-ui, sans-serif; }
 .thresh { stroke-dasharray: 4 3; stroke-width: 1; opacity: .8; }
-.thresh-label { font: 9px system-ui, sans-serif; }
+.thresh-label { font: 10px system-ui, sans-serif; }
 .verdict { margin: 6px 0 0; padding: 8px 10px; border-radius: 6px; font: 14px/1.4 system-ui, sans-serif; border-left: 4px solid var(--ok); background: color-mix(in srgb, var(--ok) 10%, transparent); }
 .verdict.warn { border-color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); }
 .verdict.bad { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, transparent); }
 footer { font-size: .85rem; color: var(--muted); margin-top: 40px; }
-.event-figure { margin: 24px 0; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
+footer p { max-width: 50em; }
+.event-figure { margin: 24px 0 8px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
 .event-figure figcaption { margin-top: 8px; color: var(--muted); font: 13px/1.5 system-ui, sans-serif; }
 .event-results { font: 14px/1.5 system-ui, sans-serif; }
 .event-results > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .event-results dd { margin: 0; font-weight: 600; }
+.step.comparison { margin: 40px auto; }
 .comparison li { margin-bottom: 12px; }
+#event-result { font-size: .95rem; }
 @media (max-height: 560px) { .dash { position: static; max-height: none; } }
 
 /* Wide screens: the charts sit in a sticky column beside the prose, so they never cover the sliders. */
@@ -54,9 +57,17 @@ footer { font-size: .85rem; color: var(--muted); margin-top: 40px; }
   .layout { display: grid; grid-template-columns: minmax(0, 560px) 520px; gap: 40px; max-width: 1120px; margin: 0 auto; align-items: start; }
   .layout .dash { position: sticky; top: 16px; bottom: auto; margin: 56px 0 0; max-height: calc(100vh - 32px); box-shadow: none; }
   .hero, footer { max-width: 1120px; }
+  /* The event comparison reuses the same split: prose on the left, its own chart on the right. */
+  .comparison { max-width: 1120px; display: grid; grid-template-columns: minmax(0, 560px) 520px; grid-template-areas: "intro panel" "notes panel"; column-gap: 40px; align-items: start; }
+  .event-intro { grid-area: intro; }
+  .event-notes { grid-area: notes; }
+  .event-panel { grid-area: panel; position: sticky; top: 16px; margin-top: 4px; }
+  .event-panel .event-figure { margin-top: 0; }
 }
 
 .more > summary { cursor: pointer; font: 600 13px system-ui, sans-serif; color: var(--accent); padding: 6px 0; }
 /* Phones: keep the pinned panel small so it never hides the prose and sliders. */
 @media (max-width: 1039px) { .dash { max-height: 32vh; } .dash .verdict { font-size: 13px; } }
 @media (min-width: 1040px) { .more > summary { display: none; } }
+/* The SVG viewBox is 520 units wide, so on phones its text shrinks. Larger units keep it readable. */
+@media (max-width: 600px) { .tick { font-size: 14px; } .thresh-label { font-size: 13px; } }

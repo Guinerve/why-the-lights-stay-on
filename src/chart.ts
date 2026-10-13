@@ -20,7 +20,7 @@ export interface ChartOpts {
 
 const W = 520;
 const H = 190;
-const M = { l: 48, r: 10, t: 8, b: 22 };
+const M = { l: 48, r: 18, t: 8, b: 24 };
 
 export function drawChart(svg: SVGSVGElement, series: Series[], o: ChartOpts): void {
   const iw = W - M.l - M.r;
