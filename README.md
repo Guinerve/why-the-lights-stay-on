@@ -4,6 +4,8 @@
 
 An interactive explainer of what happens to grid frequency in the seconds after a big generator trips.
 
+**[Open the live explainer](https://guinerve.github.io/demos/why-the-lights-stay-on/)**
+
 ![The explainer page: prose and sliders on the left, frequency, RoCoF and response charts on the right](assets/screenshot.png)
 
 When a large generator trips, the grid suddenly has less supply than demand, and frequency falls. Inertia slows the fall at first. Governors and batteries then add power and stop it. I built this page to show how each of those parts changes the result. You move six sliders and three charts update at once.
