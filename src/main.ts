@@ -47,7 +47,7 @@ function render(): void {
     hlines: [
       { y: NORMAL_LOW_HZ, color: "var(--ok)", label: "normal band" },
       { y: CONTINGENCY_LOW_HZ, color: "var(--warn)", label: "event reference 49.5" },
-      { y: UFLS_HZ, color: "var(--bad)", label: "UFLS reference 49.0" },
+      { y: UFLS_HZ, color: "var(--bad)", label: "load shedding 49.0" },
     ],
   });
   const rAxis = niceTicks(rMin, rMax);
@@ -69,20 +69,20 @@ function render(): void {
     yFormat: (v) => `${v.toFixed(0)}%`,
   });
 
-  $("#nadir").textContent = `nadir ${s.nadir.toFixed(2)} Hz at ${s.nadirT.toFixed(1)} s`;
+  $("#nadir").textContent = `minimum ${s.nadir.toFixed(2)} Hz at ${s.nadirT.toFixed(1)} s`;
   $("#rocof").textContent = `starts at ${s.initialRocof.toFixed(2)} Hz/s`;
 
   const v = $("#verdict");
   v.className = "verdict";
   if (s.uflsTriggered) {
     v.classList.add("bad");
-    v.textContent = `The model reaches ${s.nadir.toFixed(2)} Hz, at or below the illustrative 49.0 Hz load-shedding threshold. No load is shed in this simulation.`;
+    v.textContent = `The model reaches ${s.nadir.toFixed(2)} Hz. This is at or below the example 49.0 Hz load shedding threshold. The simulation does not shed any load.`;
   } else if (s.nadir < CONTINGENCY_LOW_HZ) {
     v.classList.add("warn");
-    v.textContent = `The model reaches ${s.nadir.toFixed(2)} Hz, below the 49.5 Hz event reference but above the illustrative load-shedding threshold.`;
+    v.textContent = `The model reaches ${s.nadir.toFixed(2)} Hz. This is below the 49.5 Hz event reference but above the example load shedding threshold.`;
   } else {
     v.classList.add("ok");
-    v.textContent = `The model minimum is ${s.nadir.toFixed(2)} Hz, above the 49.5 Hz event reference. This frequency-only model cannot predict customer outages.`;
+    v.textContent = `The model minimum is ${s.nadir.toFixed(2)} Hz, above the 49.5 Hz event reference. This model shows frequency only, so it cannot predict customer outages.`;
   }
 }
 
@@ -96,7 +96,7 @@ function renderEvent(): void {
   });
   $("#event-nadir").textContent = `${s.nadir.toFixed(2)} Hz at ${s.nadirT.toFixed(2)} s`;
   $("#event-gap").textContent = `+${(s.nadir - KOGAN_CREEK.reportedLowHz).toFixed(2)} Hz`;
-  $("#event-result").textContent = `The model falls, reaches a minimum, then partly recovers. Its minimum is ${(s.nadir - KOGAN_CREEK.reportedLowHz).toFixed(2)} Hz higher than the reported event minimum. The model’s ${s.nadirT.toFixed(2)} s timing is a calculated result, not an event measurement.`;
+  $("#event-result").textContent = `The model falls, reaches a minimum, then partly recovers. Its minimum is ${(s.nadir - KOGAN_CREEK.reportedLowHz).toFixed(2)} Hz higher than the reported minimum. The model reaches its minimum at ${s.nadirT.toFixed(2)} s. That time is a calculated result, not an event measurement.`;
   $<HTMLAnchorElement>("#event-source").href = KOGAN_CREEK.sourceUrl;
 }
 
